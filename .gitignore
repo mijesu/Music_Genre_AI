@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.Python
+venv/
+env/
+
+# Models (too large)
+*.pth
+*.pt
+*.ckpt
+
+# Audio files
+*.mp3
+*.wav
+*.flac
+
+# Outputs
+*.png
+*.jpg
+classification_report.txt
+*.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
