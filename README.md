@@ -1,23 +1,35 @@
-# Scripts Organization
+# Music_ReClass
+
+Reclassify music files using AI models (JMLA, GTZAN, FMA datasets).
+
+## Project Overview
+
+Music genre classification system using:
+- **OpenJMLA** pretrained model (Vision Transformer for audio)
+- **GTZAN dataset** (10 genres, ~1000 audio files)
+- **FMA Medium dataset** (25,000 tracks, 16 genres)
 
 ## Directory Structure
 
 ```
-scripts/
+Music_Reclass/
 ├── training/          # Model training scripts
 ├── analysis/          # Data analysis and model inspection
 ├── utils/            # Utility functions and helpers
-└── examples/         # Example code and templates
+├── examples/         # Example code and templates
+├── classify_music_tbc.py      # Classify Music_TBC folder
+└── classify_with_jmla.py      # Classify using JMLA clustering
 ```
 
 ## Training Scripts (`training/`)
 
 ### Quick Start
 - **quick_baseline.py** - Fast XGBoost baseline (2-5 min, no GPU)
+- **train_gtzan_v2.py** ⭐ - Production-ready with OpenJMLA (RECOMMENDED)
 - **compare_models.py** - Compare XGBoost vs Deep Learning
 
 ### Deep Learning
-- **train_gtzan_openjmla.py** - Transfer learning with GPU monitoring (RECOMMENDED)
+- **train_gtzan_openjmla.py** - Transfer learning with GPU monitoring
 - **train_with_openjmla.py** - Original transfer learning script
 - **Classifed_JMLA_GTZAN.py** - Enhanced training with memory management
 
@@ -43,27 +55,45 @@ scripts/
 
 ## Usage
 
-### Get Quick Baseline
+### Quick Baseline
 ```bash
-python3 scripts/training/quick_baseline.py
+python3 training/quick_baseline.py
 ```
 
 ### Analyze Datasets
 ```bash
-python3 scripts/analysis/analyze_data.py
+python3 analysis/analyze_data.py
 ```
 
-### Train with Deep Learning
+### Train Production Model (Recommended)
 ```bash
-python3 scripts/training/train_gtzan_openjmla.py
+python3 training/train_gtzan_v2.py
+```
+
+### Classify Music Files
+```bash
+python3 classify_music_tbc.py
+# or
+python3 classify_with_jmla.py
 ```
 
 ### Compare Approaches
 ```bash
-python3 scripts/training/compare_models.py
+python3 training/compare_models.py
 ```
 
 ### Monitor GPU
 ```bash
-python3 scripts/utils/gpu_monitor.py
+python3 utils/gpu_monitor.py
 ```
+
+## Requirements
+
+- Python 3.10+
+- PyTorch 2.8.0 with CUDA
+- librosa, torchaudio, matplotlib
+- xgboost (for baseline)
+
+## Project Documentation
+
+Full documentation available at: `/media/mijesu_970/SSD_Data/Kiro_Projects/Music_Reclass/`
