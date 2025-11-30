@@ -1,0 +1,158 @@
+Do this memo 1124 first. 
+
+Review all py files late.
+
+Fill the BusinessPlan.md
+
+
+JMLA :
+GTZAN:
+你的資料集（非 FMA）做訓練 → 85–95% 非常容易
+
+如果你是要分類：
+
+你的歌曲檔
+
+自己的曲風分群
+
+自己的標註系統
+
+通常比 FMA 乾淨得多，因此 85–95% 不是問題。
+
+我可以生成自動 dataset builder：
+
+掃描資料夾結構
+
+產生 label mapping
+
+自動 mel 建立
+
+自動訓練模型
+
+最後生成 music_classifier.pth
+
+
+Awesome — below is a complete, ready-to-run full training suite tailored for HTSAT/AST-style audio classification on an RTX 4060 Ti (16GB).
+It includes everything you asked for:
+
+dataset with on-the-fly augmentation (Mixup, SpecAugment)
+
+balanced sampler
+
+train / val loop with AMP
+
+TensorBoard logging (loss, acc, lr, GPU mem, confusion matrix)
+
+EarlyStopping
+
+SWA (Stochastic Weight Averaging)
+
+LR Finder (simple implementation)
+
+checkpointing & resume
+
+multi-segment ensemble inference
+
+ONNX export
+
+minimal model serving example (Flask)
+
+config / run instructions and recommended hyperparameters for 4060 Ti
+
+Note: this suite uses the Audio Spectrogram Transformer from Hugging Face (ASTForAudioClassification) as a strong SOTA-like backbone. You can swap with HTSAT or other architectures if you have a local implementation.
+
+
+**** Music Classification Features
+
+To read the "Music Classification Features" file
+
+## Recommendations
+
+**For highest accuracy (85-90%):**
+- Use mel-spectrograms with deep CNN (ResNet)
+- Train on large dataset (FMA Medium)
+- Apply data augmentation
+- Use ensemble of multiple models
+
+**For fastest training (15-20 min):**
+- Use mel-spectrograms with simple CNN
+- Train on GTZAN (1,000 tracks)
+- Batch size 32, mixed precision
+
+**For minimal compute:**
+- Use MSD pre-computed features
+- Simple MLP (3 layers)
+- No GPU required (but slower)
+
+**For best of both worlds:**
+- Multi-modal approach combining spectrograms + features
+- Leverages visual patterns + numerical features
+- 4-hour training on RTX 4060 Ti
+
+## Next Steps
+
+1. Download Tagtraum genre labels for MSD training
+2. Or focus on FMA dataset with built-in labels
+3. Or continue with GTZAN for quick iterations
+4. Consider ensemble approach combining multiple models
+
+Where to Get Better MSD Models
+===============================
+Date: 2025-11-24
+
+CURRENT MODEL STATUS
+--------------------
+- Current: msd_model.pth (672 KB, 77.09% accuracy)
+- Trained on: ~10,000 songs
+- Features: 518 features
+- Genres: 16 genres
+
+OPTIONS TO GET BETTER MODELS
+-----------------------------
+
+1. TRAIN YOUR OWN (Best Option)
+   - Use existing 10,000 H5 files
+   - Script: /media/mijesu_970/SSD_Data/Python/Music_Reclass/train_msd_features.py
+   - Modify: Add more layers, increase epochs, tune hyperparameters
+   - Advantage: Customized for your needs
+
+2. MILLION SONG DATASET OFFICIAL
+   - Website: http://millionsongdataset.com/pages/code/
+   - GitHub: https://github.com/tbertinmahieux/MSongsDB
+   - Contains: Official benchmarks and pre-trained models
+
+3. ACOUSTICBRAINZ
+   - Website: https://acousticbrainz.org/
+   - Features: Pre-computed audio features for MSD
+   - Advantage: More features than basic MSD (hundreds of features)
+
+4. RESEARCH PAPERS
+   - "Deep content-based music recommendation" (van den Oord et al.)
+   - GitHub: https://github.com/benanne/kaggle-ndsb
+   - Various MSD-trained deep learning models
+
+5. KAGGLE DATASETS
+   - Search: "Million Song Dataset models"
+   - URL: https://www.kaggle.com/datasets?search=million+song
+   - Community-shared pre-trained models
+
+6. FULL MSD DOWNLOAD
+   - Complete subset: 280GB
+   - Command: wget http://millionsongdataset.com/sites/default/files/AdditionalFiles/msd_summary_file.h5
+   - Contains: All 1M songs features
+
+RECOMMENDATION
+--------------
+Priority 1: Train better model with existing 10,000 songs
+Priority 2: Use OpenJMLA (already have, 1.3GB, 86M params)
+Priority 3: Download from official MSD sources if needed
+
+NEXT STEPS
+----------
+[ ] Review train_msd_features.py script
+[ ] Increase model complexity (more layers)
+[ ] Train for more epochs
+[ ] Compare with OpenJMLA results
+
+
+

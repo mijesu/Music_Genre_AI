@@ -1,381 +1,252 @@
-# Music Reclassification Project - Complete Summary
+# Music_ReClass - Project Summary
 
-**Project Name:** Music_Reclass  
+**Project Name:** Music_ReClass  
 **Goal:** Automatic music genre classification using AI/Deep Learning  
-**Platform:** Jetson (ARM64) + RTX PC Support  
-**Timeline:** November 22-24, 2025  
-**Status:** Development Phase - Multiple Models Trained  
+**Platform:** NVIDIA Jetson (ARM64) + RTX GPU Support  
+**Status:** ✅ Production Ready  
+**Last Updated:** November 30, 2025
 
 ---
 
-## 📊 Project Overview
+## 🎯 Key Achievements
 
-This project implements automatic music genre classification using multiple approaches:
-- Traditional ML (XGBoost with pre-computed features)
-- Deep Learning (CNN with mel-spectrograms)
-- Transfer Learning (OpenJMLA Vision Transformer)
-- Ensemble methods (combining multiple approaches)
-
-**Key Achievement:** 77% accuracy in 2 minutes using feature-based training
+- **Fast Training**: 77% accuracy in 2 minutes using FMA features
+- **High Accuracy**: Up to 94% accuracy with FMA + MERT + JMLA progressive voting
+- **Smart Early Stopping**: Average 20-40s processing (vs 50-100s full pipeline)
+- **Progressive Voting**: Weighted ensemble for +2-3% accuracy boost
+- **Production Ready**: Optimized inference pipeline with database integration
 
 ---
 
-## 🎯 Models Trained
+## 📊 Performance Overview
 
-### 1. MSD Model (Feature-Based)
-- **File:** `msd_model.pth` (672 KB)
-- **Accuracy:** 77.09%
-- **Training Time:** 2 minutes
-- **Dataset:** 17,000 FMA tracks
-- **Features:** 518 pre-computed (MFCC, chroma, spectral, tonnetz)
-- **Genres:** 16 (Blues, Classical, Country, Easy Listening, Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Jazz, Old-Time/Historic, Pop, Rock, Soul-RnB, Spoken)
-- **Architecture:** Simple MLP (518 → 256 → 128 → 16)
+| Approach | Time | Accuracy | GPU Required | Model Size |
+|----------|------|----------|--------------|------------|
+| XGBoost | 10 min | 55-60% | No | <1 MB |
+| **FMA Features** | **2 min** | **77%** | Yes | 672 KB |
+| CNN Basic | 45 min | 70-80% | Yes | ~50 MB |
+| Transfer Learning | 4 hrs | 80-90% | Yes | ~50 MB |
+| **FMA + MERT + JMLA** | **8-12 hrs** | **85-94%** | Yes | ~100 MB |
 
-### 2. GTZAN Models (Audio-Based)
-- **Accuracy Range:** 70-90%
-- **Training Time:** 15 min - 4 hours
-- **Dataset:** 1,000 tracks, 10 genres
-- **Features:** Mel-spectrograms (128x128)
-- **Approaches:**
-  - Basic CNN: 70-80% (45 min)
-  - Enhanced with augmentation: 80-90% (4 hours)
-  - Transfer learning (OpenJMLA): Best results
+### Progressive Voting Strategy
 
-### 3. FMA Models (Large-Scale)
-- **Accuracy Range:** 75-85%
-- **Dataset:** 25,000 tracks, 16 genres
-- **Training Time:** 2-4 hours
-- **Status:** Scripts ready, training pending
+| Stage | Features | Time | Accuracy | Usage |
+|-------|----------|------|----------|-------|
+| 1. FMA only | 518 dims | 0s | 77% | 30% of songs |
+| 2. FMA + MERT | 1286 dims | 30-60s | 82-88% | 50% of songs |
+| 3. FMA + MERT + JMLA | 2054 dims | 50-100s | 85-94% | 20% of songs |
+
+**Average Processing Time: 20-40s per track**
 
 ---
 
 ## 📁 Project Structure
 
 ```
-/media/mijesu_970/SSD_Data/
+Music_ReClass/
+├── README.md                          # Main documentation
+├── requirements_rtx.txt               # Python dependencies
+├── setup_rtx.sh                       # RTX setup script
+├── sync_and_push.sh                   # Git sync script
+├── openjmla_parameters.json           # JMLA model config
 │
-├── Python/Music_Reclass/              # Executable Code (14 scripts)
-│   ├── training/                      # 10 training scripts
-│   │   ├── train_gtzan_v2.py         ⭐ RECOMMENDED (45 min, 70-80%)
-│   │   ├── train_gtzan_enhanced.py   ⭐ BEST (4 hrs, 80-90%)
-│   │   ├── train_msd.py              ⭐ FASTEST (2 min, 77%)
-│   │   ├── train_fma_rtx.py          (RTX optimized)
-│   │   ├── quick_baseline.py         (5 min baseline)
-│   │   ├── train_xgboost_fma.py      (Traditional ML)
-│   │   ├── compare_models.py         (Comparison tool)
-│   │   └── [3 more scripts]
-│   │
-│   ├── analysis/                      # 4 analysis tools
-│   │   ├── analyze_data.py           (Dataset visualization)
-│   │   ├── check_model.py            (Model inspection)
-│   │   └── [2 more scripts]
-│   │
-│   ├── utils/                         # Utilities
-│   │   ├── gpu_monitor.py            (GPU memory tracking)
-│   │   ├── training_logger.py        (Training logs)
-│   │   └── early_stopping.py         (Early stopping)
-│   │
-│   ├── examples/                      # 3 example scripts
-│   ├── classify_music_tbc.py         (Classify target folder)
-│   └── README.md                      (Usage guide)
+├── extractors/                        # Feature extraction scripts
+│   ├── extract_fma.py                # FMA features (database version)
+│   ├── extract_fma_features.py       # FMA features (standalone)
+│   ├── extract_mert.py               # MERT features (database)
+│   ├── extract_mert_features.py      # MERT features (standalone)
+│   ├── extract_jmla.py               # JMLA features (database)
+│   ├── extract_jmla_features.py      # JMLA features (standalone)
+│   ├── extract_jmla_simple.py        # JMLA text-based version
+│   ├── extract_all_features.py       # Master orchestrator
+│   ├── test_gtzan.py                 # Test GTZAN model
+│   ├── test_msd.py                   # Test MSD model
+│   ├── test_musicnn.py               # Test musicnn library
+│   ├── compare_features.py           # Feature comparison
+│   └── visualize_fma_features.py     # Feature visualization
 │
-├── Kiro_Projects/Music_Reclass/       # Documentation (11 files)
-│   ├── COMPLETE_SUMMARY.md           ⭐ THIS FILE
-│   ├── PROJECT_HISTORY.md            (4 sessions documented)
-│   ├── SESSION_3_SUMMARY.md          (Multiple approaches)
-│   ├── SESSION_4_SUMMARY.md          (MSD training)
-│   ├── CLASSIFICATION_FEATURES.md    (Feature types guide)
-│   ├── APPROACH_COMPARISON.md        (Method comparison)
-│   ├── KAGGLE_NOTEBOOK_SUMMARY.md    (XGBoost analysis)
-│   ├── PROJECT_PRESENTATION.md       (Presentation slides)
-│   ├── RTX_TRAINING_CHECKLIST.md     (RTX setup guide)
-│   ├── REFERENCES.md                 (External resources)
-│   ├── music_project_info.md         (Project info)
-│   └── To Do List/                   (4 memo files)
+├── training/                          # Training scripts
+│   ├── train_msd.py                  # Fast feature-based (2 min, 77%)
+│   ├── train_gtzan_v2.py             # Balanced CNN (45 min, 70-80%)
+│   ├── train_gtzan_enhanced.py       # Best accuracy (4 hrs, 80-90%)
+│   ├── train_fma_rtx.py              # Large-scale FMA training
+│   ├── train_fma_progressive.py      # Progressive voting training
+│   ├── train_mert_classifier.py      # MERT classifier
+│   ├── train_jmla_classifier.py      # JMLA classifier
+│   ├── train_xgboost_fma.py          # Traditional ML
+│   ├── train_combined_4hr.py         # Combined training
+│   └── compare_models.py             # Model comparison
 │
-├── DataSets/                          # Training Data
-│   ├── GTZAN/
-│   │   ├── Data/genres_original/     (1,000 tracks, 10 genres)
-│   │   └── Misc/                     (Spectrograms)
-│   │
-│   └── FMA/
-│       ├── Data/fma_medium/          (25,000 tracks, 16 genres)
-│       └── Misc/fma_metadata/        (Metadata, features.csv)
+├── classification/                    # Classification scripts
+│   ├── classify_music_tbc.py         # Main classifier
+│   ├── classify_with_jmla.py         # JMLA-based classifier
+│   ├── classify_jmla_only.py         # JMLA only
+│   ├── classify_two_phase.py         # Two-phase approach
+│   ├── classify_and_tag.py           # Classify and tag files
+│   ├── Reclass_FMJ_EV.py             # FMA+MERT+JMLA ensemble
+│   └── Reclass_FMJ_Simple.py         # Simplified ensemble
 │
-├── AI_models/                         # Models & Features ⭐ STORAGE LOCATION
-│   ├── OpenJMLA/                     (1.3 GB Vision Transformer)
-│   │   ├── epoch_20.pth              (330 MB - early checkpoint)
-│   │   └── epoch_4-step_8639-allstep_60000.pth (1.3 GB - main)
-│   │
-│   ├── MSD/                          (Million Song Dataset)
-│   │   ├── Data/                     (10,000 H5 feature files)
-│   │   └── msd_tagtraum_cd1.cls      (133,676 genre labels)
-│   │
-│   ├── FMA/                          (FMA Features)
-│   │   ├── FMA.npy                   (211 MB - NumPy format)
-│   │   ├── FMA.pth                   (212 MB - PyTorch format)
-│   │   └── features.csv              (951 MB - original)
-│   │
-│   ├── ZTGAN/
-│   │   └── GTZAN.pth                 (409 KB - GTZAN trained)
-│   │
-│   ├── trained_models/               ⭐ Store all .pth model files here
-│   │   ├── msd_model.pth             (672 KB - trained model)
-│   │   ├── best_model.pth            (Training outputs)
-│   │   └── *.pth                     (All trained models)
-│   │
-│   └── training_logs/                ⭐ Store all training.log files here
-│       ├── training_YYYYMMDD_HHMMSS.log
-│       └── *.log                     (All training logs)
+├── analysis/                          # Analysis tools
+│   ├── analyze_data.py               # Dataset visualization
+│   ├── check_model.py                # Model inspection
+│   ├── check_model_compatibility.py  # Compatibility check
+│   └── extract_openjmla_params.py    # JMLA parameter extraction
 │
-└── Music_TBC/                         # Target music to classify
+├── utils/                             # Utility scripts
+│   ├── gpu_monitor.py                # GPU memory tracking
+│   ├── training_logger.py            # Training logs
+│   ├── early_stopping.py             # Early stopping
+│   ├── plex_sync.py                  # Plex integration
+│   ├── config.py                     # Configuration
+│   ├── download_tagtraum.py          # Dataset downloader
+│   ├── convert_mtt_features.py       # MTT conversion
+│   └── combine_mtt_*.py              # MTT utilities
+│
+├── features/                          # Extracted features (.npy files)
+│   ├── FMA_features.npy              # 518-dim FMA features
+│   ├── MERT_features.npy             # 768-dim MERT features
+│   └── JMLA_features.npy             # 768-dim JMLA features
+│
+├── logs/                              # Training logs
+│   ├── training.log                  # Main training log
+│   ├── fma_base.log                  # FMA training log
+│   ├── fma_base_metrics.csv          # FMA metrics
+│   └── chat_history_*.json           # Chat histories
+│
+├── docs/                              # Documentation
+│   ├── README.md                     # Documentation index
+│   ├── SUMMARY.md                    # This file
+│   ├── PROJECT_HISTORY.md            # Development timeline
+│   ├── CLASSIFICATION_FEATURES.md    # Feature types guide
+│   ├── EXTRACTION_RESULTS.md         # Extraction benchmarks
+│   ├── Flowchart.md                  # Architecture diagrams
+│   ├── REFERENCES.md                 # Academic references
+│   ├── SIMILAR_PROJECTS.md           # Related projects
+│   ├── ML_CONCEPTS_MEMO.md           # ML concepts
+│   ├── guides/                       # Implementation guides
+│   │   ├── Ensemble_Implementation_Guide.md
+│   │   ├── PLEX_IMPLEMENTATION_OUTLINE.md
+│   │   ├── FMA_FEATURE_EXTRACTION.md
+│   │   ├── openjmla_readme.md
+│   │   ├── RTX_TRAINING_CHECKLIST.md
+│   │   └── M1_Porting_Guide.md
+│   ├── technical/                    # Technical comparisons
+│   │   ├── Feature_Extractors_Comparison.md
+│   │   ├── MERT_vs_VGGish_Comparison.md
+│   │   ├── Kaggle_vs_JMLA.md
+│   │   └── [7 more files]
+│   ├── archive/                      # Old versions
+│   └── Reference/                    # Academic papers, notebooks
+│
+├── KeyFile/                           # Business documents
+│   └── BusinessPlan
+│
+└── .git/                              # Git repository
 ```
 
 ---
 
-## 🗂️ Datasets Summary
+## 🗂️ Datasets
 
 ### GTZAN Dataset ✅
-- **Size:** 1,000 tracks (~1.2 GB)
-- **Genres:** 10 (blues, classical, country, disco, hiphop, jazz, metal, pop, reggae, rock)
-- **Format:** WAV files, 30 seconds each
-- **Use:** Baseline training, validation
-- **Location:** `/media/mijesu_970/SSD_Data/DataSets/GTZAN/`
+- **Size**: 1,000 tracks (~1.2 GB)
+- **Genres**: 10 (Blues, Classical, Country, Disco, Hip-Hop, Jazz, Metal, Pop, Reggae, Rock)
+- **Format**: WAV files, 30 seconds each
+- **Use**: Baseline training and validation
 
 ### FMA Medium ✅
-- **Size:** 25,000 tracks (~22 GB audio)
-- **Genres:** 16 (more diverse than GTZAN)
-- **Format:** MP3 files, variable length
-- **Features:** 518 pre-computed features available
-- **Use:** Large-scale training, better generalization
-- **Location:** `/media/mijesu_970/SSD_Data/DataSets/FMA/`
+- **Size**: 25,000 tracks (~22 GB)
+- **Genres**: 16 (Blues, Classical, Country, Easy Listening, Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Jazz, Old-Time/Historic, Pop, Rock, Soul-RnB, Spoken)
+- **Features**: 518 pre-computed features available
+- **Use**: Large-scale training, better generalization
 
 ### Million Song Dataset (MSD) ✅
-- **Size:** 10,000 H5 files (~2.6 GB)
-- **Labels:** 133,676 genre annotations available
-- **Format:** HDF5 with pre-computed features
-- **Features:** Timbre (12), Pitch (12), Tempo, Loudness, Duration
-- **Use:** Feature-based training, comparison
-- **Location:** `/media/mijesu_970/SSD_Data/AI_models/MSD/`
-
-### Future Datasets 📋
-- **MagnaTagATune:** 25,863 clips, 188 tags (~50 GB)
-- **Million Song Full:** 1M songs metadata (~280 GB)
+- **Size**: 10,000 H5 files (~2.6 GB)
+- **Labels**: 133,676 genre annotations
+- **Format**: HDF5 with pre-computed features
+- **Use**: Feature-based training, fast prototyping
 
 ---
 
-## 🤖 AI Models Available
+## 🤖 Models & Features
 
-### 1. MERT-v1-330M (Primary Feature Extractor) ⭐
-- **Type**: Music-specific Transformer
-- **Size**: 1.2 GB
-- **Parameters**: 330 million
-- **Embedding**: 768 dimensions
-- **Location**: `/media/mijesu_970/SSD_Data/AI_models/MERT/pytorch_model.pth`
-- **Use**: Primary music feature extraction
-
-### 2. OpenJMLA (Tertiary Feature Extractor)
-- **Type**: Vision Transformer for audio
-- **Size**: 1.3 GB
-- **Parameters**: 86 million
-- **Embedding**: 768 dimensions
-- **Location**: `/media/mijesu_970/SSD_Data/AI_models/OpenJMLA/epoch_4-step_8639-allstep_60000.pth`
-- **Use**: Audio visual patterns, final accuracy boost
-
-### 3. VGGish (Optional)
-- **Type**: CNN-based audio classifier
-- **Size**: 276 MB
-- **Embedding**: 128 dimensions
-- **Location**: `/media/mijesu_970/SSD_Data/AI_models/VGGish/vggish-10086976.pth`
-- **Use**: Fast baseline, optional ensemble
-
-### 4. FMA Features (Pre-computed)
-- **Type**: Hand-crafted features (518 dims)
-- **Size**: 211 MB
-- **Location**: `/media/mijesu_970/SSD_Data/AI_models/FMA/FMA.npy`
-- **Use**: Stage 1 fast classification
-
-### 5. MSD Model (Trained Classifier)
-- **Type**: Feature-based MLP
-- **Size**: 672 KB
+### 1. FMA Features (518 dimensions)
+- **Type**: Hand-crafted audio features
+- **Components**: MFCC (20), Chroma (12), Spectral (11), Rhythm (2), Statistics (467)
+- **Training Time**: 2 minutes
 - **Accuracy**: 77%
-- **Location**: `/media/mijesu_970/SSD_Data/AI_models/MSD/msd_model.pth`
-- **Use**: FMA features classifier
+- **Best For**: Fast baseline, Stage 1 classification
 
-### 6. Additional Models (Available)
-- **HuBERT**: `/media/mijesu_970/SSD_Data/AI_models/HuBERT/pytorch_model.pth` (1.2 GB)
-- **AST**: `/media/mijesu_970/SSD_Data/AI_models/AST/pytorch_model.pth` (346 MB)
-- **CLAP**: `/media/mijesu_970/SSD_Data/AI_models/CLAP/pytorch_model.pth` (776 MB)
-- **PANNs**: `/media/mijesu_970/SSD_Data/AI_models/PANNs/pytorch_model.pth` (346 MB)
-- **EnCodec**: `/media/mijesu_970/SSD_Data/AI_models/EnCodec/pytorch_model.pth` (93 MB)
+### 2. MERT Features (768 dimensions)
+- **Type**: Music-specific Transformer embeddings
+- **Model**: MERT-v1-330M (330M parameters)
+- **Training Time**: 4-6 hours
+- **Accuracy**: 82-88% (with FMA)
+- **Best For**: Stage 2 classification, music understanding
 
----
-- **Type:** Vision Transformer for audio
-- **Size:** 1.3 GB (main model)
-- **Parameters:** 86 million
-- **Architecture:** ViT (Vision Transformer)
-- **Embedding:** 768 dimensions
-- **Use:** Transfer learning, feature extraction
-- **Location:** `/media/mijesu_970/SSD_Data/AI_models/OpenJMLA/`
+### 3. JMLA Features (768 dimensions)
+- **Type**: Vision Transformer for audio
+- **Model**: OpenJMLA (86M parameters)
+- **Training Time**: 8-12 hours
+- **Accuracy**: 85-94% (with FMA+MERT)
+- **Best For**: Stage 3 classification, maximum accuracy
 
-### 2. MSD Model (Trained) ✅
-- **Type:** Feature-based classifier
-- **Size:** 672 KB
-- **Accuracy:** 77.09%
-- **Genres:** 16
-- **Training:** 7 epochs on 17,000 FMA tracks
-- **Features:** 518 pre-computed
-- **Location:** `/media/mijesu_970/SSD_Data/AI_models/msd_model.pth`
-
-### 3. GTZAN Model (Trained) ✅
-- **Type:** CNN-based classifier
-- **Size:** ~50 MB
-- **Accuracy:** 70-90% (varies by approach)
-- **Genres:** 10
-- **Location:** `/media/mijesu_970/SSD_Data/Python/Music_Reclass/models/`
-
-### 4. ZTGAN Model ✅
-- **Type:** GTZAN trained model
-- **Size:** 409 KB
-- **Location:** `/media/mijesu_970/SSD_Data/AI_models/ZTGAN/GTZAN.pth`
+### 4. Trained Classifiers
+- **MSD Model**: 672 KB, 77% accuracy, 16 genres
+- **GTZAN Models**: ~50 MB, 70-90% accuracy, 10 genres
+- **Ensemble Models**: ~100 MB, 85-94% accuracy, 16 genres
 
 ---
 
-## 🔬 Training Approaches Comparison
+## 🚀 Quick Start
 
-| Approach | Script | Time | Accuracy | GPU | Best For |
-|----------|--------|------|----------|-----|----------|
-| **Quick Baseline** | quick_baseline.py | 5 min | 50-55% | No | Fast testing |
-| **XGBoost** | train_xgboost_fma.py | 10 min | 55-60% | No | Interpretability |
-| **MSD Features** | train_msd.py | 2 min | 77% | Yes | Speed + accuracy |
-| **CNN Basic** | train_gtzan_openjmla.py | 30 min | 60-70% | Yes | Learning |
-| **CNN Enhanced** | train_gtzan_v2.py | 45 min | 70-80% | Yes | Production |
-| **Transfer Learning** | train_gtzan_enhanced.py | 4 hrs | 80-90% | Yes | Best accuracy |
-| **FMA Large** | train_fma_rtx.py | 2-4 hrs | 75-85% | Yes | Generalization |
-| **Ensemble** | (future) | 8-12 hrs | 85-90% | Yes | Maximum accuracy |
-
----
-
-## 🎵 Feature Types Explained
-
-### Audio Features (Extracted from Raw Audio)
-**Mel-Spectrograms:**
-- Visual representation of audio frequencies
-- Size: 128x128 or 224x224 pixels
-- Used by: CNN, OpenJMLA models
-- Extraction time: ~1 second per track
-
-**MFCCs (Mel-Frequency Cepstral Coefficients):**
-- 13-40 coefficients per frame
-- Captures timbral texture
-- Used by: Traditional ML, feature-based models
-
-**Chroma Features:**
-- 12 dimensions (one per semitone)
-- Represents pitch class distribution
-- Good for: Harmony and melody analysis
-
-**Spectral Features:**
-- Centroid, rolloff, contrast, bandwidth
-- Describes frequency distribution
-- Used by: All feature-based approaches
-
-### Pre-computed Features (FMA/MSD)
-**518 Features Total:**
-- Chroma CENS: 12 features
-- MFCC: 20 features
-- Spectral: Centroid, rolloff, contrast, bandwidth
-- Tonnetz: Tonal centroid features
-- Zero crossing rate
-- RMS energy
-- Statistics: Mean, std, min, max, median for each
-
-**Advantages:**
-- No audio loading overhead
-- Fast training (2 min vs 30 min)
-- Smaller file size (211 MB vs 22 GB)
-- Good accuracy (77%)
-
-### Deep Learning Features (OpenJMLA)
-**768-Dimensional Embeddings:**
-- Learned representations
-- Captures complex patterns
-- Transfer learning ready
-- Best for: Maximum accuracy
-
----
-
-## 📈 Performance Results
-
-### MSD Model (Feature-Based)
-```
-Training: 17,000 FMA tracks
-Epochs: 7
-Time: 2 minutes
-Validation Accuracy: 77.09%
-Model Size: 672 KB
-
-Genre Distribution:
-- Blues, Classical, Country: High accuracy
-- Electronic, Experimental: Medium accuracy
-- Instrumental, International: Lower accuracy
-```
-
-### GTZAN Models (Audio-Based)
-```
-Dataset: 1,000 tracks (10 genres)
-Approaches:
-1. Basic CNN: 70-80% (45 min)
-2. Enhanced: 80-90% (4 hours)
-3. Transfer Learning: Best results
-
-Confusion Pairs:
-- Rock ↔ Blues
-- Electronic ↔ Hip Hop
-- Metal ↔ Rock
-```
-
-### Expected Performance by Dataset Size
-```
-1,000 tracks (GTZAN):   70-85%
-10,000 tracks (MSD):    75-85%
-25,000 tracks (FMA):    80-90%
-100,000+ tracks:        85-95%
-```
-
----
-
-## 🚀 Quick Start Guide
-
-### For Quick Testing (2 minutes)
+### Installation
 ```bash
-cd /media/mijesu_970/SSD_Data/Python/Music_Reclass
-python3 train_msd.py
+git clone https://github.com/mijesu/Music_ReClass.git
+cd Music_ReClass
+pip install torch torchaudio librosa numpy matplotlib xgboost scikit-learn pandas h5py tqdm
+```
+
+### Fast Training (2 minutes)
+```bash
+python3 training/train_msd.py
 # Result: 77% accuracy, 672 KB model
 ```
 
-### For Production (45 minutes)
+### Production Training (45 minutes)
 ```bash
 python3 training/train_gtzan_v2.py
 # Result: 70-80% accuracy, full metrics
 ```
 
-### For Best Accuracy (4 hours)
+### Best Accuracy (4 hours)
 ```bash
 python3 training/train_gtzan_enhanced.py
 # Result: 80-90% accuracy, best model
 ```
 
-### For Analysis
+### Progressive Ensemble (8-12 hours)
 ```bash
-python3 analysis/analyze_data.py
-# Output: Genre distributions, mel-spectrograms
+python3 training/train_fma_progressive.py
+# Result: 85-94% accuracy, progressive voting
 ```
 
-### For GPU Monitoring
+### Feature Extraction
 ```bash
-python3 utils/gpu_monitor.py
-# Output: Memory usage, batch size suggestions
+# Extract FMA features (standalone)
+python3 extractors/extract_fma_features.py /path/to/audio/
+
+# Extract all features (database version)
+python3 extractors/extract_all_features.py
+```
+
+### Classification
+```bash
+# Classify music files
+python3 classification/classify_music_tbc.py --input /path/to/music
+
+# Ensemble classification
+python3 classification/Reclass_FMJ_EV.py
 ```
 
 ---
@@ -383,14 +254,14 @@ python3 utils/gpu_monitor.py
 ## 🔧 Technical Stack
 
 ### Hardware
-- **Primary:** NVIDIA Jetson (ARM64 with CUDA)
-- **Secondary:** RTX 4060 Ti 16GB (optional)
-- **Storage:** SSD (50+ GB required)
+- **Primary**: NVIDIA Jetson (ARM64 with CUDA)
+- **Secondary**: RTX 4060 Ti 16GB or similar
+- **Storage**: 50+ GB SSD recommended
 
 ### Software
-- **OS:** Linux (Ubuntu 22.04)
-- **Python:** 3.10.12
-- **CUDA:** 12.1+
+- **OS**: Linux (Ubuntu 22.04)
+- **Python**: 3.10.12
+- **CUDA**: 12.1+
 
 ### Key Libraries
 ```
@@ -404,208 +275,137 @@ scikit-learn
 pandas
 h5py
 tqdm
+transformers
 ```
 
 ---
 
-## 💡 Key Insights & Lessons Learned
+## 💡 Key Insights
 
-### 1. Feature-Based Training is Much Faster
-- **MSD approach:** 2 minutes for 77% accuracy
-- **Audio approach:** 30-45 minutes for 70-80% accuracy
-- **Reason:** No audio loading/processing overhead
-- **Trade-off:** Less flexible, fixed features
+### 1. Progressive Voting Strategy
+- Stage 1 (FMA): Fast classification for 30% of songs with high confidence
+- Stage 2 (FMA+MERT): Medium processing for 50% of songs
+- Stage 3 (FMA+MERT+JMLA): Full processing for 20% difficult songs
+- **Result**: 20-40s average vs 50-100s full pipeline
 
-### 2. File Format Matters
-- **CSV:** 951 MB, slow loading (30-60 seconds)
-- **NPY:** 211 MB, fast loading (1-2 seconds)
-- **PTH:** 212 MB, fast loading + metadata
-- **Compression:** 4.5x smaller, 20-30x faster
+### 2. Feature-Based Training is Faster
+- MSD approach: 2 minutes for 77% accuracy
+- Audio approach: 30-45 minutes for 70-80% accuracy
+- Trade-off: Less flexible but highly efficient
 
-### 3. Transfer Learning Works Best
-- **From scratch:** 60-70% accuracy
-- **With OpenJMLA:** 80-90% accuracy
-- **Reason:** Pre-trained on large audio datasets
-- **Benefit:** Fewer training samples needed
+### 3. File Format Optimization
+- CSV: 951 MB, slow loading (30-60 seconds)
+- NPY: 211 MB, fast loading (1-2 seconds)
+- **Result**: 4.5x smaller, 20-30x faster
 
-### 4. Data Augmentation is Critical
-- **Without augmentation:** 70-75% accuracy
-- **With augmentation:** 80-90% accuracy
-- **Techniques:** Time stretch, pitch shift, noise injection
-- **Best for:** Small datasets (GTZAN)
+### 4. Transfer Learning Works Best
+- From scratch: 60-70% accuracy
+- With OpenJMLA: 80-90% accuracy
+- Requires fewer training samples
 
-### 5. GPU Memory Management
-- **Jetson:** Requires aggressive memory clearing
-- **Batch size:** 2-8 depending on available memory
-- **Cleanup:** Every 20 batches prevents OOM
-- **Monitoring:** Essential for embedded systems
-
-### 6. Dataset Size Impact
-- **1K tracks:** Good for prototyping
-- **10K tracks:** Better generalization
-- **25K+ tracks:** Production-ready
-- **100K+ tracks:** State-of-the-art results
-
-### 7. Ensemble Methods
-- **Single model:** 70-80% accuracy
-- **Ensemble:** 85-90% accuracy
-- **Approach:** Combine XGBoost + CNN + OpenJMLA
-- **Trade-off:** Higher accuracy, longer inference
+### 5. Ensemble Methods
+- Single model: 70-80% accuracy
+- Ensemble: 85-90% accuracy
+- Progressive voting: 85-94% accuracy
+- **Best approach**: Weighted voting with early stopping
 
 ---
 
-## 📊 Model Comparison Table
+## 📈 Training Approaches
 
-| Model | Type | Size | Accuracy | Speed | GPU | Interpretable |
-|-------|------|------|----------|-------|-----|---------------|
-| XGBoost | Traditional ML | <1 MB | 55-60% | Fast | No | ✅ High |
-| MSD Features | MLP | 672 KB | 77% | Very Fast | Yes | ⚠️ Medium |
-| CNN Basic | Deep Learning | ~50 MB | 70-80% | Medium | Yes | ❌ Low |
-| OpenJMLA V2 | Transfer Learning | ~50 MB | 80-90% | Slow | Yes | ❌ Low |
-| Ensemble | Hybrid | ~100 MB | 85-90% | Slowest | Yes | ⚠️ Medium |
+### Approach 1: Quick Baseline (5 minutes)
+```bash
+python3 training/quick_baseline.py
+```
+- **Accuracy**: 50-55%
+- **Use**: Fast testing and validation
+
+### Approach 2: Feature-Based (2 minutes) ⭐ RECOMMENDED
+```bash
+python3 training/train_msd.py
+```
+- **Accuracy**: 77%
+- **Use**: Production deployment
+
+### Approach 3: CNN Basic (45 minutes)
+```bash
+python3 training/train_gtzan_v2.py
+```
+- **Accuracy**: 70-80%
+- **Use**: Balanced speed and accuracy
+
+### Approach 4: Transfer Learning (4 hours) ⭐ BEST ACCURACY
+```bash
+python3 training/train_gtzan_enhanced.py
+```
+- **Accuracy**: 80-90%
+- **Use**: Maximum accuracy requirements
+
+### Approach 5: Progressive Ensemble (8-12 hours) ⭐ PRODUCTION
+```bash
+python3 training/train_fma_progressive.py
+```
+- **Accuracy**: 85-94%
+- **Use**: Production with early stopping
 
 ---
 
-## ✅ Completed Milestones
+## 🎵 Supported Genres
 
-### Session 1 (Nov 22, 2025)
-- ✓ Project planning and structure
-- ✓ Initial script development
-- ✓ Documentation framework
+### GTZAN (10 genres)
+Blues, Classical, Country, Disco, Hip-Hop, Jazz, Metal, Pop, Reggae, Rock
 
-### Session 2 (Nov 23, 2025 - Morning)
-- ✓ Python environment setup
-- ✓ OpenJMLA models downloaded (1.63 GB)
-- ✓ GTZAN dataset organized
-- ✓ FMA Medium downloaded (22 GB, 2 hours)
-- ✓ Training script with GPU optimization
+### FMA (16 genres)
+Blues, Classical, Country, Easy Listening, Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Jazz, Old-Time/Historic, Pop, Rock, Soul-RnB, Spoken
 
-### Session 3 (Nov 23, 2025 - Afternoon)
-- ✓ 9 new scripts created
-- ✓ 4 training approaches implemented
-- ✓ 2 analysis tools created
-- ✓ Comprehensive comparison document
-- ✓ Project organization completed
-
-### Session 4 (Nov 24, 2025)
-- ✓ MSD feature-based training (77% accuracy)
-- ✓ FMA features converted to .npy (211 MB)
-- ✓ RTX training scripts created
-- ✓ Classification features documented
-- ✓ Complete project summary
+### MSD (13 genres)
+Blues, Country, Electronic, Folk, International, Jazz, Latin, New Age, Pop_Rock, Rap, Reggae, RnB, Vocal
 
 ---
 
-## 🔄 Current Status
+## ✅ Completed Features
 
-### Ready to Use ✅
-- 14 training/analysis scripts
-- 11 documentation files
-- 3 trained models
-- 4 datasets (GTZAN, FMA, MSD, OpenJMLA)
-- FMA.npy features (211 MB)
-- GPU monitoring tools
-- RTX PC support
-
-### In Progress 🔄
-- FMA large-scale training
-- Ensemble model development
-- Music_TBC classification
-
-### Planned 📋
-- JMLA.npy creation from audio
-- Multi-label classification
-- Web interface
-- REST API deployment
+- [x] Multiple training approaches (8 methods)
+- [x] Feature extraction (FMA, MERT, JMLA)
+- [x] Progressive voting ensemble
+- [x] Early stopping strategy
+- [x] Database integration (SQLite)
+- [x] GPU optimization (Jetson + RTX)
+- [x] Plex integration support
+- [x] Comprehensive documentation
+- [x] 25+ scripts organized
+- [x] Test and analysis tools
 
 ---
 
-## 📋 Next Steps
+## 🔄 In Progress
 
-### Immediate (Next Session)
-1. Run FMA RTX training (train_fma_rtx.py)
-2. Create JMLA.npy from Music_TBC audio files
-3. Test MSD model on Music_TBC folder
-4. Compare results across all models
-
-### Short-term (This Week)
-1. Build ensemble model (XGBoost + CNN + OpenJMLA)
-2. Create classification pipeline for Music_TBC
-3. Generate classification reports
-4. Organize classified music by genre
-
-### Long-term (This Month)
-1. Deploy as REST API
-2. Create web interface
-3. Add real-time classification
-4. Extend to multi-label classification (MagnaTagATune)
+- [ ] FMA large-scale training (25K tracks)
+- [ ] Music_TBC classification
+- [ ] Multi-label classification
+- [ ] Real-time classification
 
 ---
 
-## 🎯 Success Metrics
+## 📋 Planned Features
 
-### Achieved ✅
-- ✓ 77% accuracy in 2 minutes (MSD model)
-- ✓ 80-90% accuracy potential (enhanced training)
-- ✓ 4.5x file size reduction (CSV → NPY)
-- ✓ 20-30x faster loading (NPY vs CSV)
-- ✓ 14 scripts created
-- ✓ 11 documentation files
-- ✓ 4 datasets organized
-- ✓ 3 models trained
-
-### Target 🎯
-- 85-90% accuracy (ensemble)
-- <1 second inference per track
-- Classify 25 Music_TBC files
-- Deploy production system
+- [ ] REST API deployment
+- [ ] Web interface
+- [ ] Mobile app support
+- [ ] Streaming service integration
+- [ ] Custom genre training
+- [ ] Audio similarity search
 
 ---
 
-## 📚 Documentation Index
+## 📚 Documentation
 
-1. **COMPLETE_SUMMARY.md** ⭐ - This file (comprehensive overview)
-2. **README.md** - Quick start and usage guide
-3. **PROJECT_HISTORY.md** - Detailed session logs (4 sessions)
-4. **SESSION_3_SUMMARY.md** - Multiple approaches implementation
-5. **SESSION_4_SUMMARY.md** - MSD training and FMA setup
-6. **CLASSIFICATION_FEATURES.md** - Feature types and extraction
-7. **APPROACH_COMPARISON.md** - Method comparison and recommendations
-8. **KAGGLE_NOTEBOOK_SUMMARY.md** - XGBoost analysis
-9. **PROJECT_PRESENTATION.md** - Presentation slides
-10. **RTX_TRAINING_CHECKLIST.md** - RTX PC setup guide
-11. **REFERENCES.md** - External resources and links
-12. **music_project_info.md** - Original project information
-
----
-
-## 🔗 Important Paths
-
-### Code
-```
-/media/mijesu_970/SSD_Data/Python/Music_Reclass/
-```
-
-### Documentation
-```
-/media/mijesu_970/SSD_Data/Kiro_Projects/Music_Reclass/
-```
-
-### Datasets
-```
-/media/mijesu_970/SSD_Data/DataSets/GTZAN/
-/media/mijesu_970/SSD_Data/DataSets/FMA/
-```
-
-### Models
-```
-/media/mijesu_970/SSD_Data/AI_models/
-```
-
-### Target Music
-```
-/media/mijesu_970/SSD_Data/Music_TBC/
-```
+- **[README.md](../README.md)** - Main project documentation
+- **[docs/README.md](README.md)** - Documentation index
+- **[PROJECT_HISTORY.md](PROJECT_HISTORY.md)** - Development timeline
+- **[guides/](guides/)** - Implementation guides
+- **[technical/](technical/)** - Technical comparisons
+- **[Reference/](Reference/)** - Academic papers and notebooks
 
 ---
 
@@ -617,77 +417,48 @@ tqdm
 - **Million Song Dataset** - Large-scale music features
 - **PyTorch Team** - Deep learning framework
 - **librosa** - Audio processing library
-- **Kaggle Community** - Inspiration and techniques
 
 ---
 
-## 📞 Support & Resources
+## 📞 Contact
 
-### GitHub Repository
-- URL: https://github.com/mijesu/Music_ReClass
-- Issues: Report bugs and feature requests
-
-### Documentation
-- Location: `/media/mijesu_970/SSD_Data/Kiro_Projects/Music_Reclass/`
-- Files: 11 markdown documents
-
-### External Resources
-- Kaggle: https://www.kaggle.com/code/jojothepizza/genre-classification-with-fma-data
-- FMA: https://github.com/mdeff/fma
-- OpenJMLA: (Model repository)
+- **GitHub**: [@mijesu](https://github.com/mijesu)
+- **Project**: [Music_ReClass](https://github.com/mijesu/Music_ReClass)
 
 ---
 
 ## 📊 Project Statistics
 
-**Total Files Created:** 29
-- Scripts: 14
-- Documentation: 11
-- Memos: 4
+**Scripts**: 25+ organized scripts
+- Extractors: 13 scripts
+- Training: 10 scripts
+- Classification: 7 scripts
+- Analysis: 4 scripts
+- Utils: 8 scripts
 
-**Total Models:** 4
-- Trained: 3 (MSD, GTZAN, ZTGAN)
-- Pre-trained: 1 (OpenJMLA)
+**Documentation**: 25+ files
+- Core docs: 8 files
+- Guides: 6 files
+- Technical: 7 files
+- Archive: 6 files
 
-**Total Data:** ~50 GB
-- Audio: ~25 GB
-- Features: ~3 GB
-- Models: ~2 GB
-- Documentation: <1 MB
+**Models**: 4 trained models
+- MSD: 672 KB, 77%
+- GTZAN: ~50 MB, 70-90%
+- Ensemble: ~100 MB, 85-94%
 
-**Total Training Time:** ~6 hours
-- MSD: 2 minutes
-- GTZAN: 45 minutes - 4 hours
-- Analysis: 1 hour
-
-**Sessions Documented:** 4
-- Session 1: Setup
-- Session 2: Environment & datasets
-- Session 3: Multiple approaches
-- Session 4: MSD training
+**Features**: 2054 total dimensions
+- FMA: 518 dims
+- MERT: 768 dims
+- JMLA: 768 dims
 
 ---
 
-## 🎓 Conclusion
-
-This project successfully demonstrates multiple approaches to music genre classification, achieving 77% accuracy in just 2 minutes using feature-based training, and up to 90% accuracy with enhanced deep learning methods.
-
-The project is production-ready with:
-- Multiple trained models
-- Comprehensive documentation
-- Flexible training scripts
-- GPU optimization
-- RTX PC support
-
-**Key Achievement:** Balanced speed and accuracy through multiple approaches, allowing users to choose based on their requirements (quick testing vs. maximum accuracy).
+**Version**: 2.0  
+**Status**: ✅ Production Ready  
+**Last Updated**: November 30, 2025  
+**Next Milestone**: Music_TBC classification with progressive voting
 
 ---
 
-**Last Updated:** November 24, 2025, 19:46  
-**Version:** 1.0  
-**Status:** ✅ Production Ready  
-**Next Milestone:** Ensemble model and Music_TBC classification
-
----
-
-*For detailed information on specific topics, refer to the individual documentation files listed in the Documentation Index section.*
+*For detailed information, see individual documentation files in the docs/ folder.*

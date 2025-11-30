@@ -1,0 +1,19 @@
+# Plex Integration
+plexapi==4.15.0
+
+# Existing Music_ReClass dependencies
+torch==2.8.0
+torchaudio==2.8.0
+librosa==0.11.0
+numpy==1.26.4
+
+# Database
+sqlite3  # Built-in
+
+# Web UI
+flask==3.0.0
+flask-cors==4.0.0
+
+# Utilities
+tqdm==4.66.0
+pandas==2.1.0

@@ -1,0 +1,70 @@
+I had a music library around 100k songs.
+Extrack the the feature from each songs. 
+Create a database to store ID3tags (ex. artist, title, gener, year ......) and feature value.
+Access/college those feature values that to create the pth or npy file.
+How to choose around 10k song from music library to do classifily geners ??
+What is simply/easy process to do ??
+May I link those with JRiver or foobar2000 ?
+Music evl. comment as JMLA that stored in database.
+make the LRC for each song in database.
+Build REST API - Deploy as web service
+Create web interface - User-friendly classification
+Real-time classification - Live audio input
+Multi-label classification - Multiple genres per track
+
+
+Requirements for each custom genre:
+- Minimum: 100 songs (more is better)
+- Same format as existing data (MP3/WAV/FLAC)
+- Organized in separate folders
+
+Alternative: Two-Stage Classification
+If you don't want to retrain everything:
+1. Use existing model for 13 genres
+2. Add a second classifier just for your 2-3 custom genres
+3. Run both and combine results
+
+
+
+> Which will be bettery,"
+1. load songs extrack feature by 3 models.
+2. load a batch songs extrack by 1 models, do as loop with 3 models.
+
+> Option 2 is better - Load batch, extract with 1 model, loop through 3 models.
+
+✅ Benefits:
+- Only 1 model in memory at a time
+- Better GPU memory management
+- Can process in batches (e.g., 100 songs at a time)
+- Can resume if interrupted
+- Easier to debug
+
+Recommended workflow:
+bash
+# Step 1: FMA features (2 min for 100 songs)
+python3 extract_fma.py --input songs/ --output fma_features.npy
+
+# Step 2: MERT features (30 min for 100 songs)
+python3 extract_mert.py --input songs/ --output mert_features.npy
+
+# Step 3: JMLA features (30 min for 100 songs)
+python3 extract_jmla.py --input songs/ --output jmla_features.npy
+
+# Step 4: Combine
+python3 combine_features.py --output combined_features.npy
+
+
+For 10k songs from your 100k library:
+- Option 1: ~15-20 hours, high memory risk
+- Option 2: ~12-15 hours, stable, resumable
+
+
+Web UI
+
+For 100k songs, you need:
+- ✅ Search/filter capabilities
+- ✅ Visual genre distribution
+- ✅ Batch operations
+- ✅ Export/reports
+- ✅ Easy navigation
+

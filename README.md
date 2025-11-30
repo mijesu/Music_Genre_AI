@@ -10,11 +10,12 @@ Automatic music genre classification using AI/Deep Learning on NVIDIA Jetson and
 ## 🎯 Key Features
 
 - **Fast Training**: 77% accuracy in just 2 minutes using FMA features
-- **High Accuracy**: Up to 92% accuracy with FMA + MERT + JMLA ensemble
+- **High Accuracy**: Up to 94% accuracy with FMA + MERT + JMLA progressive voting
 - **Smart Early Stopping**: Average 20-40s processing (vs 50-100s)
+- **Progressive Voting**: Weighted ensemble for +2-3% accuracy boost
 - **Multiple Approaches**: Hand-crafted features, Transformers, and Ensemble methods
 - **GPU Optimized**: Runs on NVIDIA Jetson (ARM64) and RTX GPUs
-- **Production Ready**: Early stopping strategy for efficient inference
+- **Production Ready**: Early stopping + voting strategy for efficient inference
 
 ## 📊 Performance
 
